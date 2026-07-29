@@ -21,27 +21,12 @@ public class RabbitConfig {
     }
 
     @Bean
-    Queue notificationQueue() {
-        return new Queue("notification.queue");
-    }
-
-    @Bean
     Binding inventoryBinding(
             Queue inventoryQueue,
             FanoutExchange exchange) {
 
         return BindingBuilder
                 .bind(inventoryQueue)
-                .to(exchange);
-    }
-
-    @Bean
-    Binding notificationBinding(
-            Queue notificationQueue,
-            FanoutExchange exchange) {
-
-        return BindingBuilder
-                .bind(notificationQueue)
                 .to(exchange);
     }
 

@@ -9,6 +9,6 @@ public class PaymentService {
 
     @RabbitListener(queues = "payment.queue")
     public void process(OrderCreatedEvent event) {
-        System.out.printf("Payment for order '%d' started...", event.orderId());
+        System.out.printf("Payment for order '%d' started...\n", event.orderId());
     }
 }
