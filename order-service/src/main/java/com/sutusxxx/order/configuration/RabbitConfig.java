@@ -16,21 +16,6 @@ public class RabbitConfig {
     }
 
     @Bean
-    Queue inventoryQueue() {
-        return new Queue("inventory.queue");
-    }
-
-    @Bean
-    Binding inventoryBinding(
-            Queue inventoryQueue,
-            FanoutExchange exchange) {
-
-        return BindingBuilder
-                .bind(inventoryQueue)
-                .to(exchange);
-    }
-
-    @Bean
     public MessageConverter messageConverter() {
         return new JacksonJsonMessageConverter();
     }

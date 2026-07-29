@@ -1,4 +1,4 @@
-package com.sutusxxx.configuration;
+package com.sutusxxx.inventory.configuration;
 
 import org.springframework.amqp.core.Binding;
 import org.springframework.amqp.core.BindingBuilder;
@@ -19,17 +19,17 @@ public class RabbitConfig {
     }
 
     @Bean
-    Queue notificationQueue() {
-        return new Queue("notification.queue");
+    Queue inventoryQueue() {
+        return new Queue("inventory.queue");
     }
 
     @Bean
-    Binding notificationBinding(
-            Queue notificationQueue,
+    Binding inventoryBinding(
+            Queue inventoryQueue,
             FanoutExchange exchange) {
 
         return BindingBuilder
-                .bind(notificationQueue)
+                .bind(inventoryQueue)
                 .to(exchange);
     }
 

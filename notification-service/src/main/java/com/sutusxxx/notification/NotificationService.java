@@ -1,4 +1,4 @@
-package com.sutusxxx;
+package com.sutusxxx.notification;
 
 import com.sutusxxx.contracts.OrderCreatedEvent;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
