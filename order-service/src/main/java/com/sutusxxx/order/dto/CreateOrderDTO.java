@@ -1,8 +1,9 @@
 package com.sutusxxx.order.dto;
 
-import java.util.List;
+import java.math.BigDecimal;
 
 public record CreateOrderDTO(
-        List<Long> itemIds
+    Long customerId,
+    BigDecimal total
 ) {
 }

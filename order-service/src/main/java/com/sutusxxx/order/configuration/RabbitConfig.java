@@ -1,6 +1,8 @@
 package com.sutusxxx.order.configuration;
 
 import org.springframework.amqp.core.*;
+import org.springframework.amqp.support.converter.JacksonJsonMessageConverter;
+import org.springframework.amqp.support.converter.MessageConverter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -19,11 +21,6 @@ public class RabbitConfig {
     }
 
     @Bean
-    Queue paymentQueue() {
-        return new Queue("payment.queue");
-    }
-
-    @Bean
     Queue notificationQueue() {
         return new Queue("notification.queue");
     }
@@ -39,16 +36,6 @@ public class RabbitConfig {
     }
 
     @Bean
-    Binding paymentBinding(
-            Queue paymentQueue,
-            FanoutExchange exchange) {
-
-        return BindingBuilder
-                .bind(paymentQueue)
-                .to(exchange);
-    }
-
-    @Bean
     Binding notificationBinding(
             Queue notificationQueue,
             FanoutExchange exchange) {
@@ -56,5 +43,10 @@ public class RabbitConfig {
         return BindingBuilder
                 .bind(notificationQueue)
                 .to(exchange);
+    }
+
+    @Bean
+    public MessageConverter messageConverter() {
+        return new JacksonJsonMessageConverter();
     }
 }
