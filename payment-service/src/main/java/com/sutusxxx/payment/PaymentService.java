@@ -1,14 +1,10 @@
 package com.sutusxxx.payment;
 
-import com.sutusxxx.contracts.OrderCreatedEvent;
-import org.springframework.amqp.rabbit.annotation.RabbitListener;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 @Service
+@RequiredArgsConstructor
 public class PaymentService {
-
-    @RabbitListener(queues = "payment.queue")
-    public void process(OrderCreatedEvent event) {
-        System.out.printf("Payment for order '%d' started...\n", event.orderId());
-    }
+    private final PaymentPublisher publisher;
 }

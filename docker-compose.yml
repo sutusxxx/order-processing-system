@@ -8,7 +8,7 @@ services:
       - 15672:15672
     environment:
       RABBITMQ_DEFAULT_USER: admin
-      RABBITMQ_DEFAULT_PASSWORD: admin
+      RABBITMQ_DEFAULT_PASS: admin
     configs:
       - source: rabbitmq-plugins
         target: /etc/rabbitmq/enabled_plugins

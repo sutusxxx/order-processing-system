@@ -1,9 +1,6 @@
 package com.sutusxxx.notification.configuration;
 
-import org.springframework.amqp.core.Binding;
-import org.springframework.amqp.core.BindingBuilder;
-import org.springframework.amqp.core.FanoutExchange;
-import org.springframework.amqp.core.Queue;
+import org.springframework.amqp.core.*;
 import org.springframework.amqp.support.converter.JacksonJsonMessageConverter;
 import org.springframework.amqp.support.converter.MessageConverter;
 import org.springframework.context.annotation.Bean;
@@ -11,26 +8,21 @@ import org.springframework.context.annotation.Configuration;
 
 @Configuration
 public class RabbitConfig {
-    public static final String EXCHANGE = "orders.exchange";
+    public static final String QUEUE = "notification.order-created.queue";
 
     @Bean
-    FanoutExchange exchange() {
-        return new FanoutExchange(EXCHANGE);
+    TopicExchange exchange() {
+        return new TopicExchange("order.exchange", true, false);
     }
 
     @Bean
     Queue notificationQueue() {
-        return new Queue("notification.queue");
+        return QueueBuilder.durable(QUEUE).build();
     }
 
     @Bean
-    Binding notificationBinding(
-            Queue notificationQueue,
-            FanoutExchange exchange) {
-
-        return BindingBuilder
-                .bind(notificationQueue)
-                .to(exchange);
+    Binding binding(Queue notificationQueue, TopicExchange orderExchange) {
+        return BindingBuilder.bind(notificationQueue).to(orderExchange).with("order.created");
     }
 
     @Bean

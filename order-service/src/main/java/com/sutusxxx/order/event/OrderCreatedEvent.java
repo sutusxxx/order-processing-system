@@ -1,10 +1,12 @@
-package com.sutusxxx.contracts;
+package com.sutusxxx.order.event;
 
 import java.math.BigDecimal;
+import java.time.Instant;
 
 public record OrderCreatedEvent(
         Long orderId,
         Long customerId,
-        BigDecimal total
+        BigDecimal total,
+        Instant createdAt
 ) {
 }

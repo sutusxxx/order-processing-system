@@ -1,13 +1,15 @@
 package com.sutusxxx.inventory;
 
-import com.sutusxxx.contracts.OrderCreatedEvent;
+import com.sutusxxx.inventory.configuration.RabbitConfig;
+import com.sutusxxx.inventory.event.OrderCreatedEvent;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.stereotype.Service;
 
 @Service
 public class InventoryService {
-    @RabbitListener(queues = "inventory.queue")
+
+    @RabbitListener(queues = RabbitConfig.QUEUE)
     public void process(OrderCreatedEvent event) {
-        System.out.printf("Inventory checked for order '%d'...\n", event.orderId());
+        System.out.printf("Stock reservation for order '%d'...\n", event.orderId());
     }
 }

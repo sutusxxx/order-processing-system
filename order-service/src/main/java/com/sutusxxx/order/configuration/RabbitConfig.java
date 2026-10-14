@@ -8,11 +8,11 @@ import org.springframework.context.annotation.Configuration;
 
 @Configuration
 public class RabbitConfig {
-    public static final String EXCHANGE = "orders.exchange";
+    public static final String ORDER_EXCHANGE = "order.exchange";
 
     @Bean
-    FanoutExchange exchange() {
-        return new FanoutExchange(EXCHANGE);
+    TopicExchange orderExchange() {
+        return new TopicExchange(ORDER_EXCHANGE, true, false);
     }
 
     @Bean

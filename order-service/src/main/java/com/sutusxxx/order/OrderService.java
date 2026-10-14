@@ -1,9 +1,11 @@
 package com.sutusxxx.order;
 
-import com.sutusxxx.contracts.OrderCreatedEvent;
 import com.sutusxxx.order.dto.CreateOrderDTO;
+import com.sutusxxx.order.event.OrderCreatedEvent;
 import com.sutusxxx.order.repository.OrderRepository;
 import org.springframework.stereotype.Service;
+
+import java.time.Instant;
 
 @Service
 public class OrderService {
@@ -17,13 +19,18 @@ public class OrderService {
         this.orderRepository = orderRepository;
     }
 
-    public void create(CreateOrderDTO dto) {
+    public Long create(CreateOrderDTO dto) {
         Order order = Order.from(dto);
         orderRepository.save(order);
-        publisher.publish(new OrderCreatedEvent(
+
+        System.out.printf("Order created with id '%d'\n", order.getId());
+        publisher.publishOrderCreated(new OrderCreatedEvent(
                 order.getId(),
                 order.getCustomerId(),
-                order.getTotal()
+                order.getTotal(),
+                Instant.now()
         ));
+
+        return order.getId();
     }
 }

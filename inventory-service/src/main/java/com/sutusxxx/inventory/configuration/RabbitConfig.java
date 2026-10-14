@@ -1,9 +1,6 @@
 package com.sutusxxx.inventory.configuration;
 
-import org.springframework.amqp.core.Binding;
-import org.springframework.amqp.core.BindingBuilder;
-import org.springframework.amqp.core.FanoutExchange;
-import org.springframework.amqp.core.Queue;
+import org.springframework.amqp.core.*;
 import org.springframework.amqp.support.converter.JacksonJsonMessageConverter;
 import org.springframework.amqp.support.converter.MessageConverter;
 import org.springframework.context.annotation.Bean;
@@ -11,26 +8,21 @@ import org.springframework.context.annotation.Configuration;
 
 @Configuration
 public class RabbitConfig {
-    public static final String EXCHANGE = "orders.exchange";
+    public static final String QUEUE = "inventory.order-created.queue";
 
     @Bean
-    FanoutExchange exchange() {
-        return new FanoutExchange(EXCHANGE);
+    TopicExchange orderExchange() {
+        return new TopicExchange("order.exchange", true, false);
     }
 
     @Bean
     Queue inventoryQueue() {
-        return new Queue("inventory.queue");
+        return QueueBuilder.durable(QUEUE).build();
     }
 
     @Bean
-    Binding inventoryBinding(
-            Queue inventoryQueue,
-            FanoutExchange exchange) {
-
-        return BindingBuilder
-                .bind(inventoryQueue)
-                .to(exchange);
+    Binding binding(Queue inventoryQueue, TopicExchange orderExchange) {
+        return BindingBuilder.bind(inventoryQueue).to(orderExchange).with("order.created");
     }
 
     @Bean
