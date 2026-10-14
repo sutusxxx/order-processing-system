@@ -20,6 +20,9 @@ public class PaymentService {
 
     @RabbitListener(queues = RabbitConfig.QUEUE)
     public void handle(InventoryReservedEvent event) {
+        if (event.totalAmount().compareTo(new BigDecimal("666")) == 0) {
+            throw new IllegalStateException("Payment gateway unavailable");
+        }
         // Simulation: Reject order if the total amount is more than 1000
         if (event.totalAmount().compareTo(new BigDecimal("1000")) > 0) {
             log.info("Payment failed for order {}", event.orderId());

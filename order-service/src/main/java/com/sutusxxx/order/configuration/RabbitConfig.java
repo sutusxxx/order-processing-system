@@ -35,7 +35,10 @@ public class RabbitConfig {
 
     @Bean
     Queue paymentCompletedQueue() {
-        return QueueBuilder.durable(PAYMENT_COMPLETED_QUEUE).build();
+        return QueueBuilder.durable(PAYMENT_COMPLETED_QUEUE)
+                .deadLetterExchange("dlx.exchange")
+                .deadLetterRoutingKey("payment.completed")
+                .build();
     }
 
     @Bean
@@ -55,7 +58,22 @@ public class RabbitConfig {
 
     @Bean
     Binding paymentFailedBinding() {
-        return BindingBuilder.bind(paymentFailedQueue()).to(paymentExchange()).with("payment.failed");
+        return BindingBuilder.bind(paymentCompletedQueue()).to(paymentExchange()).with("payment.failed");
+    }
+
+    @Bean
+    DirectExchange deadLetterExchange() {
+        return new DirectExchange("dlx.exchange", true, false);
+    }
+
+    @Bean
+    Queue paymentDlq() {
+        return QueueBuilder.durable("order.payment-completed.dlq").build();
+    }
+
+    @Bean
+    Binding paymentDlqBinding() {
+        return BindingBuilder.bind(paymentDlq()).to(deadLetterExchange()).with("payment.completed");
     }
 
     @Bean

@@ -8,6 +8,7 @@ import com.sutusxxx.order.event.OrderCreatedEvent;
 import com.sutusxxx.order.repository.OrderRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.amqp.rabbit.connection.CorrelationData;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.stereotype.Service;
 
@@ -25,16 +26,17 @@ public class OrderService {
         orderRepository.save(order);
 
         log.info("Order {} created", order.getId());
-        rabbitTemplate.convertAndSend(RabbitConfig.ORDER_EXCHANGE, "order.created",
-                new OrderCreatedEvent(
-                        order.getId(),
-                        order.getCustomerId(),
-                        order.getItems().stream()
-                                .map(item -> new OrderCreatedEvent.Item(item.getSku(), item.getQuantity()))
-                                .toList(),
-                        order.getTotalAmount(),
-                        Instant.now()
-                ));
+        OrderCreatedEvent event = new OrderCreatedEvent(
+                order.getId(),
+                order.getCustomerId(),
+                order.getItems().stream()
+                        .map(item -> new OrderCreatedEvent.Item(item.getSku(), item.getQuantity()))
+                        .toList(),
+                order.getTotalAmount(),
+                Instant.now()
+        );
+        rabbitTemplate.convertAndSend(RabbitConfig.ORDER_EXCHANGE, "order.created", event,
+                new CorrelationData(event.orderId().toString()));
 
         return order.getId();
     }
