@@ -1,6 +1,6 @@
 package com.sutusxxx.order;
 
-import com.sutusxxx.order.dto.CreateOrderDTO;
+import com.sutusxxx.order.request.CreateOrderRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -15,7 +15,7 @@ public class OrderController {
     private final OrderService orderService;
 
     @PostMapping
-    public ResponseEntity<Long> create(@RequestBody CreateOrderDTO body) {
-        return ResponseEntity.accepted().body(orderService.create(body));
+    public ResponseEntity<Long> create(@RequestBody CreateOrderRequest request) {
+        return ResponseEntity.accepted().body(orderService.create(request));
     }
 }
