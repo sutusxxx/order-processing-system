@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.Data;
 
 import java.time.Instant;
+import java.util.UUID;
 
 @Data
 @Entity
@@ -12,7 +13,7 @@ public class OutboxEvent {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    private Long id;
+    UUID id;    // message_id
     private String exchange;
     private String routingKey;
     private String payload;

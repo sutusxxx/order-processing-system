@@ -49,6 +49,8 @@ public class RabbitConfig {
 
     @Bean
     public MessageConverter messageConverter() {
-        return new JacksonJsonMessageConverter();
+        JacksonJsonMessageConverter converter = new JacksonJsonMessageConverter();
+        converter.setCreateMessageIds(true);
+        return converter;
     }
 }

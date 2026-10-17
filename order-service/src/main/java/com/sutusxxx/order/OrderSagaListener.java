@@ -14,17 +14,17 @@ public class OrderSagaListener {
     private final OrderService orderService;
 
     @RabbitListener(queues = RabbitConfig.PAYMENT_COMPLETED_QUEUE)
-    void onPaymentCompleted(PaymentCompletedEvent event) {
+    public void onPaymentCompleted(PaymentCompletedEvent event) {
         orderService.confirm(event.orderId());
     }
 
     @RabbitListener(queues = RabbitConfig.PAYMENT_FAILED_QUEUE)
-    void onPaymentFailed(PaymentFailedEvent event) {
+    public void onPaymentFailed(PaymentFailedEvent event) {
         orderService.cancel(event.orderId(), event.reason());
     }
 
     @RabbitListener(queues = RabbitConfig.INVENTORY_REJECTED_QUEUE)
-    void onInventoryRejected(InventoryRejectedEvent event) {
+    public void onInventoryRejected(InventoryRejectedEvent event) {
         orderService.cancel(event.orderId(), event.reason());
     }
 }

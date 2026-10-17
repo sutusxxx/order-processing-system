@@ -5,8 +5,10 @@ import org.springframework.amqp.support.converter.JacksonJsonMessageConverter;
 import org.springframework.amqp.support.converter.MessageConverter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.scheduling.annotation.EnableScheduling;
 
 @Configuration
+@EnableScheduling
 public class RabbitConfig {
     public static final String ORDER_EXCHANGE = "order.exchange";
     public static final String INVENTORY_REJECTED_QUEUE = "order.inventory-rejected.queue";

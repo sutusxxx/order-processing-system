@@ -24,12 +24,12 @@ public class PaymentService {
     private final ProcessedRepository processedRepository;
 
     @RabbitListener(queues = RabbitConfig.QUEUE)
-    public void handle(InventoryReservedEvent event, @Header(AmqpHeaders.MESSAGE_ID) String messageId) {
+    public void handle(InventoryReservedEvent event, @Header(AmqpHeaders.MESSAGE_ID) String messageId) throws InterruptedException {
         processOnce(messageId, event);
     }
 
     @Transactional
-    public void processOnce(String messageId, InventoryReservedEvent event) {
+    public void processOnce(String messageId, InventoryReservedEvent event) throws InterruptedException {
         if (processedRepository.existsByMessageId(messageId)) {
             log.info("Duplicate message {}, skipping", messageId);
             return;
@@ -40,6 +40,7 @@ public class PaymentService {
             throw new IllegalStateException("Payment gateway unavailable");
         }
         // Simulation: Reject order if the total amount is more than 1000
+        Thread.sleep(3000);
         if (event.totalAmount().compareTo(new BigDecimal("1000")) > 0) {
             log.info("Payment failed for order {}", event.orderId());
             rabbitTemplate.convertAndSend("payment.exchange", "payment.failed",
