@@ -36,7 +36,7 @@ public class OrderService {
                 order.getItems().stream()
                         .map(item -> new OrderCreatedEvent.Item(item.getSku(), item.getQuantity()))
                         .toList(), order.getTotalAmount(), Instant.now());
-        outboxRepository.save(OutboxEvent.from(RabbitConfig.ORDER_EXCHANGE, "order.created",
+        outboxRepository.save(OutboxEvent.kafka("order.created", order.getId().toString(),
                 objectMapper.writeValueAsString(event)));
 
         return order.getId();
@@ -50,7 +50,7 @@ public class OrderService {
         order.setStatus(OrderStatus.IN_PROGRESS);
         orderRepository.save(order);
 
-        outboxRepository.save(OutboxEvent.from(RabbitConfig.ORDER_EXCHANGE, "order.confirmed",
+        outboxRepository.save(OutboxEvent.rabbit(RabbitConfig.ORDER_EXCHANGE, "order.confirmed",
                 objectMapper.writeValueAsString(new OrderConfirmedEvent(orderId, order.getCustomerId()))));
     }
 
@@ -61,7 +61,7 @@ public class OrderService {
         order.setStatus(OrderStatus.CANCELLED);
         orderRepository.save(order);
 
-        outboxRepository.save(OutboxEvent.from(RabbitConfig.ORDER_EXCHANGE, "order.cancelled",
+        outboxRepository.save(OutboxEvent.rabbit(RabbitConfig.ORDER_EXCHANGE, "order.cancelled",
                 objectMapper.writeValueAsString(new OrderCancelledEvent(orderId, reason))));
     }
 }

@@ -11,8 +11,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.amqp.support.AmqpHeaders;
+import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.messaging.handler.annotation.Header;
 import org.springframework.stereotype.Service;
+import tools.jackson.databind.ObjectMapper;
 
 import java.io.IOException;
 
@@ -21,17 +23,24 @@ import java.io.IOException;
 @Slf4j
 public class InventoryService {
     private final RabbitTemplate rabbitTemplate;
+    private final ObjectMapper objectMapper;
 
-    @RabbitListener(queues = RabbitConfig.ORDER_CREATED_QUEUE)
-    public void handle(OrderCreatedEvent event, Channel channel,
-                       @Header(AmqpHeaders.DELIVERY_TAG) long tag) throws IOException {
-        try {
-            process(event);
-            channel.basicAck(tag, false);
-        } catch (Exception exception) {
-            channel.basicNack(tag, false, false);
-        }
+    @KafkaListener(topics = "order.created")
+    public void handle(String payload) {
+        OrderCreatedEvent event = objectMapper.readValue(payload, OrderCreatedEvent.class);
+        process(event);
     }
+
+//    @RabbitListener(queues = RabbitConfig.ORDER_CREATED_QUEUE)
+//    public void handle(OrderCreatedEvent event, Channel channel,
+//                       @Header(AmqpHeaders.DELIVERY_TAG) long tag) throws IOException {
+//        try {
+//            process(event);
+//            channel.basicAck(tag, false);
+//        } catch (Exception exception) {
+//            channel.basicNack(tag, false, false);
+//        }
+//    }
 
     @RabbitListener(queues = RabbitConfig.PAYMENT_FAILED_QUEUE)
     public void handle(PaymentFailedEvent event) {
