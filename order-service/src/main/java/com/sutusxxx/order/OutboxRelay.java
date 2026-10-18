@@ -31,6 +31,8 @@ public class OutboxRelay {
         for (OutboxEvent e : outboxRepository.findTop100ByStatusOrderByCreatedAt(OutboxStatus.PENDING)) {
             try {
                 if (e.getBroker() == Broker.KAFKA) sendKafka(e); else sendRabbit(e);
+                e.markSent();
+                outboxRepository.save(e);
             } catch (Exception exception) {
                 log.warn("Outbox publish failed, retrying next tick: {}", e.getId(), exception);
                 return;
@@ -55,8 +57,5 @@ public class OutboxRelay {
             t.waitForConfirmsOrDie(5000);
             return true;
         });
-
-        event.markSent();
-        outboxRepository.save(event);
     }
 }

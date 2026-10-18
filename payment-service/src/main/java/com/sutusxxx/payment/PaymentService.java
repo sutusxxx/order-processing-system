@@ -30,6 +30,7 @@ public class PaymentService {
 
     @Transactional
     public void processOnce(String messageId, InventoryReservedEvent event) throws InterruptedException {
+        log.info("Processing payment for order {}", event.orderId());
         if (processedRepository.existsByMessageId(messageId)) {
             log.info("Duplicate message {}, skipping", messageId);
             return;

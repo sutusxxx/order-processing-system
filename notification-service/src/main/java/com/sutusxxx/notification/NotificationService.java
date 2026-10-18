@@ -23,11 +23,6 @@ public class NotificationService {
         log.info("Sending notification about created order {}", event.orderId());
     }
 
-//    @RabbitListener(queues = RabbitConfig.QUEUE)
-//    public void handle(OrderCreatedEvent event) {
-//        log.info("Sending notification about created order {}", event.orderId());
-//    }
-
     @RabbitListener(queues = RabbitConfig.CONFIRMED_QUEUE)
     public void handle(OrderConfirmedEvent event) {
         log.info("Sending notification about confirmed order {}", event.orderId());
