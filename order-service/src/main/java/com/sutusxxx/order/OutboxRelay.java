@@ -4,10 +4,6 @@ import com.sutusxxx.order.repository.OutboxRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.clients.producer.ProducerRecord;
-import org.springframework.amqp.core.Message;
-import org.springframework.amqp.core.MessageBuilder;
-import org.springframework.amqp.core.MessageProperties;
-import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
@@ -22,15 +18,13 @@ import java.util.concurrent.TimeoutException;
 @Slf4j
 public class OutboxRelay {
     private final OutboxRepository outboxRepository;
-
-    private final RabbitTemplate rabbitTemplate;
     private final KafkaTemplate<String, String> kafkaTemplate;
 
     @Scheduled(fixedDelay =  1000)
     public void publishPending() {
         for (OutboxEvent e : outboxRepository.findTop100ByStatusOrderByCreatedAt(OutboxStatus.PENDING)) {
             try {
-                if (e.getBroker() == Broker.KAFKA) sendKafka(e); else sendRabbit(e);
+                if (e.getBroker() == Broker.KAFKA) sendKafka(e);;
                 e.markSent();
                 outboxRepository.save(e);
             } catch (Exception exception) {
@@ -44,18 +38,5 @@ public class OutboxRelay {
         var record = new ProducerRecord<>(event.getExchange(), event.getRoutingKey(), event.getPayload());
         record.headers().add("messageId", event.getId().toString().getBytes(StandardCharsets.UTF_8));
         kafkaTemplate.send(record).get(5, TimeUnit.SECONDS);
-    }
-
-    private void sendRabbit(OutboxEvent event) {
-        Message msg = MessageBuilder.withBody(event.getPayload().getBytes(StandardCharsets.UTF_8))
-                .setContentType(MessageProperties.CONTENT_TYPE_JSON)
-                .setMessageId(event.getId().toString())
-                .build();
-
-        rabbitTemplate.invoke(t -> {
-            t.send(event.getExchange(), event.getRoutingKey(), msg);
-            t.waitForConfirmsOrDie(5000);
-            return true;
-        });
     }
 }
